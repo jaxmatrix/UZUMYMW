@@ -8,6 +8,7 @@ from bokeh.models import ColumnDataSource
 from bokeh.palettes import Category10, Category20, Viridis256, Inferno256
 
 from datetime import datetime, timedelta
+import datetime as dt
 
 from Dataset.MarketDatasets import df_sales
 from Dataset.DataGen import df_claims, df_ehr, df_registry, df_rwe, df_tcga
@@ -19,6 +20,8 @@ from Dataset.MarketDatasets import DRUGS_BY_STAGE
 from Dataset.MarketDatasets import COMPETITORS
 from Dataset.Prevelance import US_REGIONS
 from Dataset.Prevelance import US_STATES
+from Dataset.DataGen import THERAPY_SEGMENT_BY_STAGE
+from Dataset.DataGen import GENE_LIST
 
 pn.extension()
 
@@ -73,6 +76,54 @@ multi_cancer_stage = pn.widgets.MultiSelect(
     value=cancer_stages,
     size=4
 )
+
+therapy_list = [THERAPY_SEGMENT_BY_STAGE[key] for key in THERAPY_SEGMENT_BY_STAGE.keys()]
+
+line_of_therapy = pn.widgets.CheckBoxGroup(
+    name='Line of Therapy', options=therapy_list, value=therapy_list
+)
+
+biomarkers_expression = pn.widgets.CheckBoxGroup(
+    name='Gene of Interest', options=GENE_LIST, value=GENE_LIST
+)
+
+# Forecast Input Fields 
+forecast_horizon = pn.widgets.IntInput(name='Forecast Horizon (months)', value=5, step=1, start=1, end=100)
+future_market_forecast = pn.widgets.IntInput(name='Future Market Forecast', value=5, step=1, start=1, end=12)
+base_market_share = pn.widgets.FloatInput(name='FloatInput', value=5., step=1e-1, start=0, end=1000)
+target_market_share = pn.widgets.FloatInput(name='FloatInput', value=5., step=1e-1, start=0, end=1000)
+gross_to_net_discount = pn.widgets.FloatInput(name='FloatInput', value=5., step=1e-1, start=0, end=1000)
+base_demand = pn.widgets.IntInput(name='Future Market Forecast', value=5, step=1, start=1, end=12)
+our_product_market_entry = pn.widgets.DateSlider(name='Date Slider', start=dt.datetime(2019, 1, 1), end=dt.datetime(2019, 6, 1), value=dt.datetime(2019, 2, 8))
+our_product_market_decline = pn.widgets.DateSlider(name='Date Slider', start=dt.datetime(2019, 1, 1), end=dt.datetime(2019, 6, 1), value=dt.datetime(2019, 2, 8))
+
+forecast_input_list = [
+    forecast_horizon,
+    future_market_forecast,
+    base_market_share,
+    target_market_share,
+    gross_to_net_discount,
+    base_demand,
+    our_product_market_entry,
+    our_product_market_decline
+]
+# Model Simulation Fields 
+
+patient_flow_simulation_time = pn.widgets.IntInput(name='Future Market Forecast', value=5, step=1, start=1, end=12)
+simulation_cycles = pn.widgets.IntInput(name='Future Market Forecast', value=5, step=1, start=1, end=12)
+
+# Action Button 
+simulate_button = pn.widgets.Button(name='Simulate', button_type='primary')
+
+# def handle_click(clicks):
+#     return f'You have clicked me {clicks} times'
+
+# pn.Column(
+#     button,
+#     pn.bind(handle_click, button.param.clicks),
+# )
+
+
 
 # -----------------------------------------------------------------------------
 # Helper function to filter DataFrame based on widget values
@@ -175,6 +226,58 @@ def incidence_tab(date_range, selected_categories, selected_groups):
 
     return p
 
+
+
+def calculate_parameters(df):
+    # Calculate Total Population
+
+    # Incidence Rate 
+
+    # Prevalence Rate 
+
+    # Diagnosis Rate
+
+    # Treeatment Rate 
+
+    # Biomarker Prevelance Rate
+
+    # Chemo Experience Rate 
+
+    # Transition Matrix Values 
+        ## Patient Flow Transition ( line of therapy )
+        ## Patient Flow Transition ( Health State Transition )
+        ## Disease Stage Transition 
+    
+    pass 
+
+def calculate_scenario(df):
+    # Calculate Market Projection for [best case, average case, worst case]
+
+    pass
+
+def calculate_health_economic_model(df):
+    # Cost per State
+
+
+    # Utility Per State 
+
+    # ICER Benchmark
+    pass 
+
+def calculate_competitor_info(df):
+    # For Every Competitor 
+        ## Start Month 
+        ## End Month
+    
+    # Our Product Stats
+        ## Our Product Start 
+        ## Our Product End 
+
+    pass
+
+def patient_segmentation(df):
+    pass 
+
 @pn.depends(
     date_slider.param.value,
     multi_cancer_type.param.value,
@@ -200,36 +303,54 @@ def updateData(one, two, three):
 
     return pn.Row(calculated_display, calculated_display2)
 
-
-tabs = pn.Tabs(
-    ("Prevalance", prevelance_tab),
-    ("Incidence", incidence_tab)
+market_simulation_input_grid = pn.GridBox(*forecast_input_list, ncols=4)
+market_simulation_tab = pn.Column(
+    simulate_button,
+    market_simulation_input_grid
 )
 
-main_plots = pn.Row(
+
+
+epi_plots = pn.Row(
     prevelance_tab, incidence_tab
 )
 
-main_layout = pn.Column(
+epi_tab = pn.Column(
     updateData,
-    main_plots,
+    epi_plots,
 )
 
+main_layout = pn.Tabs(
+    ("Epi Data", epi_tab),
+    ("Market Simulation", market_simulation_tab),
+)
 # -----------------------------------------------------------------------------
 # Layout: sidebar (widgets) + main (tabs)
 # -----------------------------------------------------------------------------
-sidebar = pn.WidgetBox(
+# Clinical Data Filters
+clinical_filters = pn.WidgetBox(
+    "<b>Clinical Filters</b>",
+    "Line of therapies",
+    line_of_therapy,
+    "Gene Expression",
+    biomarkers_expression,
+    width=359
+)
+
+# General Filters 
+filters = pn.WidgetBox(
     "<br/><b>Filters</b>",
     date_slider,
     multi_cancer_stage,
     multi_cancer_type,
-    width=500
+    width=359,
 )
 
+
 # Using a Template for a cleaner look, but you can also just use a row/column layout.
-dashboard = pn.template.FastListTemplate(
+dashboard = pn.template.MaterialTemplate(
     title="Market Forecasting Dashboard",
-    sidebar=[sidebar],
+    sidebar=[clinical_filters, "  " ,filters],
     main=[ main_layout],
 )
 

@@ -47,6 +47,14 @@ DISEASE_GENE_BASE = {
     }
 }
 
+TREATMENTS = [
+        "Chemotherapy",
+        "Targeted Therapy",
+        "Immunotherapy",
+        "Hormonal Therapy",
+        "Combination Therapy"
+    ]
+
 # Multipliers for each stage (1 through 4).
 STAGE_MULTIPLIERS = {
     1: 1.0,
@@ -57,6 +65,69 @@ STAGE_MULTIPLIERS = {
 
 GENE_LIST = ["EGFR", "KRAS", "BRAF", "PIK3CA"]
 
+OUTCOMES = [
+        "Complete Response",
+        "Partial Response",
+        "Stable Disease",
+        "Progressive Disease",
+        "Death",
+        "Discontinued"
+    ]
+
+COMORBIDITIES = [
+        "Hypertension",
+        "Diabetes",
+        "Hyperlipidemia",
+        "Obesity",
+        "Chronic Kidney Disease",
+        "Depression",
+        "Coronary Artery Disease"
+    ]
+
+
+ADVERSE_EVENTS = [
+        "Nausea",
+        "Fatigue",
+        "Neutropenia",
+        "Neuropathy",
+        "Alopecia",
+        "Anemia",
+        "Diarrhea",
+        "Rash"
+    ]
+
+DRUGS_BY_STAGE = {
+    1: ["Doxorubicin", "Cyclophosphamide", "Paclitaxel"],
+    2: ["Carboplatin", "Cisplatin", "Pembrolizumab"],
+    3: ["Trastuzumab", "Erlotinib", "Bevacizumab"],
+    4: ["Gemcitabine", "Vincristine", "Irinotecan"]
+}
+
+DIAGNOSIS = [
+        "Breast Cancer",
+        "Lung Cancer",
+        "Colorectal Cancer",
+        "Prostate Cancer",
+        "Leukemia",
+        "Lymphoma"
+    ]
+
+ETHNICITIES = [
+        "Hispanic or Latino",
+        "Not Hispanic or Latino",
+        "African American",
+        "Asian",
+        "White",
+        "Unknown"
+    ]
+
+
+THERAPY_SEGMENT_BY_STAGE = {
+    1: "First-line Therapy",
+    2: "Second-line Therapy",
+    3: "Third-line Therapy",
+    4: "Fourth-line Therapy"
+}
 # ------------------------------------------------
 # 2. Generate & Update Gene Expression
 # ------------------------------------------------
@@ -115,35 +186,15 @@ def generate_gender():
     return random.choice(["Male", "Female", "Other"])
 
 def generate_diagnosis():
-    diagnoses = [
-        "Breast Cancer",
-        "Lung Cancer",
-        "Colorectal Cancer",
-        "Prostate Cancer",
-        "Leukemia",
-        "Lymphoma"
-    ]
+    diagnoses = DIAGNOSIS
     return random.choice(diagnoses)
 
 def generate_treatment_type():
-    treatments = [
-        "Chemotherapy",
-        "Targeted Therapy",
-        "Immunotherapy",
-        "Hormonal Therapy",
-        "Combination Therapy"
-    ]
+    treatments = TREATMENTS
     return random.choice(treatments)
 
 def generate_ethnicity():
-    ethnicities = [
-        "Hispanic or Latino",
-        "Not Hispanic or Latino",
-        "African American",
-        "Asian",
-        "White",
-        "Unknown"
-    ]
+    ethnicities = ETHNICITIES
     return random.choice(ethnicities)
 
 def generate_us_location():
@@ -156,40 +207,17 @@ def generate_us_location():
     return random.choice(us_states)
 
 def generate_treatment_history():
-    possible_treatments = [
-        "Surgery",
-        "Radiotherapy",
-        "Previous Chemotherapy",
-        "Previous Immunotherapy",
-        "Hormonal Therapy"
-    ]
+    possible_treatments = TREATMENTS
     num_treatments = random.randint(0, 3)
     return random.sample(possible_treatments, num_treatments)
 
 def generate_adverse_events():
-    possible_events = [
-        "Nausea",
-        "Fatigue",
-        "Neutropenia",
-        "Neuropathy",
-        "Alopecia",
-        "Anemia",
-        "Diarrhea",
-        "Rash"
-    ]
+    possible_events = ADVERSE_EVENTS
     num_events = random.randint(0, 4)
     return random.sample(possible_events, num_events)
 
 def generate_comorbidities():
-    possible_comorbidities = [
-        "Hypertension",
-        "Diabetes",
-        "Hyperlipidemia",
-        "Obesity",
-        "Chronic Kidney Disease",
-        "Depression",
-        "Coronary Artery Disease"
-    ]
+    possible_comorbidities = COMORBIDITIES
     num_co = random.randint(0, 3)
     return random.sample(possible_comorbidities, num_co)
 
@@ -200,22 +228,10 @@ def generate_treatment_outcome():
     """
     # We add 'Discontinued' as a possible event with some probability.
     # You can tune these probabilities as needed.
-    outcomes = [
-        "Complete Response",
-        "Partial Response",
-        "Stable Disease",
-        "Progressive Disease",
-        "Death",
-        "Discontinued"
-    ]
+    outcomes = OUTCOMES
     return random.choice(outcomes)
 
-DRUGS_BY_STAGE = {
-    1: ["Doxorubicin", "Cyclophosphamide", "Paclitaxel"],
-    2: ["Carboplatin", "Cisplatin", "Pembrolizumab"],
-    3: ["Trastuzumab", "Erlotinib", "Bevacizumab"],
-    4: ["Gemcitabine", "Vincristine", "Irinotecan"]
-}
+
 
 def generate_cycle_drugs_for_stage(disease_stage):
     possible_drugs = DRUGS_BY_STAGE.get(disease_stage, [])
@@ -224,12 +240,7 @@ def generate_cycle_drugs_for_stage(disease_stage):
     num_drugs = random.randint(1, min(3, len(possible_drugs)))
     return random.sample(possible_drugs, num_drugs)
 
-THERAPY_SEGMENT_BY_STAGE = {
-    1: "First-line Therapy",
-    2: "Second-line Therapy",
-    3: "Third-line Therapy",
-    4: "Fourth-line Therapy"
-}
+
 
 # ------------------------------------------------
 # 4. Generate Treatment Cycles
